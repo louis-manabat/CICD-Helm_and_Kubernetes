@@ -1,3 +1,34 @@
+# Student: Louis Manabat (ID: s3719633)
+
+## Contents Page:
+
+
+
+# Analysis and Solution
+## Analysis of the problem
+
+
+## Explain and justify the solution
+
+
+# How to deploy the solutiion
+
+
+## Pre-requisites
+
+
+## Manual installation
+##### Please note that each line is a new command
+
+
+## Semi-automatic installation
+##### Please note that each line is a new command
+
+
+## Setting up AWS Credentials
+##### Please note we will being using AWS Educate for this example
+
+
 # Simple Todo App with MongoDB, Express.js and Node.js
 The ToDo app uses the following technologies and javascript libraries:
 * MongoDB
