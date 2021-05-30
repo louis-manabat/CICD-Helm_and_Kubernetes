@@ -1,7 +1,15 @@
 # Student: Louis Manabat (ID: s3719633)
 
 ## Contents Page:
-
+- [Analysis and Solution](#Analysis-and-Solution)
+    - [Analysis of the problem](#Analysis-of-the-problem)
+    - [Explain and justify the solution](#Explain-and-justify-the-solution)
+- [How to deploy the solutiion](#How-to-deploy-the-solutiion)
+    - [Pre-requisites](#Pre-requisites)
+        - [Manual installations](#Manual-installation)
+        - [Semi-automatic installation](#Semi-automatic-installation)
+    - [Setting up AWS Credentials](#Setting-up-AWS-Credentials)
+    - [Running commands](#Running-commands)
 
 
 # Analysis and Solution
@@ -27,6 +35,10 @@
 
 ## Setting up AWS Credentials
 ##### Please note we will being using AWS Educate for this example
+
+
+## Running commands
+
 
 
 # Simple Todo App with MongoDB, Express.js and Node.js
