@@ -1,3 +1,93 @@
+# Student: Louis Manabat (ID: s3719633)
+
+## Contents Page:
+- [Analysis and Solution](#Analysis-and-Solution)
+    - [Analysis of the problem](#Analysis-of-the-problem)
+    - [Explain and justify the solution](#Explain-and-justify-the-solution)
+- [How to deploy the solutiion](#How-to-deploy-the-solutiion)
+    - [Pre-requisites](#Pre-requisites)
+        - [Manual installations](#Manual-installation)
+        - [Semi-automatic installation](#Semi-automatic-installation)
+    - [Setting up AWS Credentials](#Setting-up-AWS-Credentials)
+    - [Running commands](#Running-commands)
+
+
+# Analysis and Solution
+## Analysis of the problem
+The process of creating the artifact has now been containerised into a Docker container. This simplifies part of the deployment of the solution. The next task is to get the solution running through Kubernetes on a CD pipeline to make the deployment of the solution easier.
+
+## Explain and justify the solution
+The solution uses several tools to deploy the solution. The process will essentially be automated, but to get it running, several Makefile commands need to be run to fully deploy the solution.
+
+Tools:
+GitHub: This is where the repository for the solution and the automation code will be stored on. In a further implementation of automating the process, CircleCI will be linked to GitHub to do CI/CD (Continuous Integration & Continuous Deployment)
+
+Terraform: Terraform is the tool that automates the creation and updating of AWS services to help ease the process, and removes the need of having to create the services using manual labour. With this, it will lower the chances of using too many resources, meaning the company will save money, which then also means the company will gain a higher profit, which increases the satisfaction of the client. 
+
+AWS: This is the service where the client wants to deploy the solution onto. Services such as an EC2 virtual machine instance, VPCs, S3 buckets and DynamoDB will be used to help run the Todo App solution when it is deployed.
+
+CircleCI: CircleCI was used to automate the packing of the artefact, from doing linting and vulnerability checks to making a packed solution. It will also be used to fully automate the deployment process.
+
+Docker: Docker will be used to containerise the application. It will pack the solution into an image. Once the the image has been created, it just needs to be deployed for it to be running.
+
+Kubernetes: Kubernetes is a service that deploys, scales and manages the application. It will be using the container that Docker creates to deploy the application. 
+
+Helm: Helm will be used to manage the Kubernetes cluster. This will manage things like the porting, databsing and the deploying of the application.
+
+# How to deploy the solutiion
+
+Please note before getting started you must have an AWS account to get started. The way this tutorial will do it will differ from how you may do it, so please keep that in mind. We will be running this in VirtualBox using an Ubuntu 20.04 image.
+
+## Pre-requisites
+
+
+## Manual installation
+##### Please note that each line is a new command
+### Updating system 
+    sudo apt update -y
+    sudo apt upgrade -y
+    sudo apt install curl make wget vim -y
+
+#### Installing Terraform
+    cd /tmp/
+    wget https://releases.hashicorp.com/terraform/0.15.4/terraform_0.15.4_linux_amd64.zip
+    unzip terraform_0.15.4_linux_amd64.zip
+    sudo mv terraform user/local/bin
+
+## Semi-automatic installation
+##### Please note that each line is a new command
+### Please run this command before starting the rest of the process
+    sudo apt update -y
+    sudo apt upgrade -y
+    sudo apt install make -y
+
+#### After successfully running that command, run the following commands (Each line is a new command)
+    make install-deps
+    make install-tf
+
+
+## Setting up AWS Credentials
+##### Please note we will being using AWS Educate for this example
+
+First login into AWS Educate and press the **My Classrooms** tab at the top. Find the course you are currently in and press the blue **Go to classroom** button on the right. Press **Continue** on the prompt that appears
+<img src="readme-images/aws-edu-myclass.png" alt="AWS-Edu-MyClass" width=50% height=50%>
+
+Upon entering the next page, press the **Account Details** button and you will be greeted with a bunch of credentials. Copy the entire set of text in the gray box as we will be using this for later. 
+### Please note that these credentials should only be used by you and you only! Do not share this with anyone else
+<br>
+<img src="readme-images/aws-account-status.png" alt="AWS-acc-status" width=50% height=50%>
+<img src="readme-images/aws-credentials.png" alt="AWS-creds" width=50% height=50%>
+<br>
+
+After doing this, open up a new tab in your terminal and run the command `mkdir ~/.aws` then run `vim ~/.aws/credentials` then press **INS** to activate insert mode then **Shift + INS** to paste the credentials. Follow this up with pressing **CTRL + C** then type in `:wq` to save and exit vim.
+<br>
+<img src="readme-images/aws-credentials-vim.png" alt="AWS-cred-vim" width=50% height=50%>
+<img src="readme-images/aws-credentials-vim-2.png" alt="AWS-cred-vim-2" width=50% height=50%>
+
+## Running commands
+
+
+
 # Simple Todo App with MongoDB, Express.js and Node.js
 The ToDo app uses the following technologies and javascript libraries:
 * MongoDB
