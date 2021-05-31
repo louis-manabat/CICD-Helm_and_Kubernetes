@@ -9,6 +9,7 @@
         - [Manual installations](#Manual-installation)
         - [Semi-automatic installation](#Semi-automatic-installation)
     - [Setting up AWS Credentials](#Setting-up-AWS-Credentials)
+    - [Pre-setup](#Pre-setup)
     - [Running commands](#Running-commands)
 
 
@@ -83,6 +84,46 @@ After doing this, open up a new tab in your terminal and run the command `mkdir 
 <br>
 <img src="readme-images/aws-credentials-vim.png" alt="AWS-cred-vim" width=50% height=50%>
 <img src="readme-images/aws-credentials-vim-2.png" alt="AWS-cred-vim-2" width=50% height=50%>
+
+## Pre-setup
+
+### Bootstrap
+The following command will create some files to make a remote backend. Run the command **once only** and them copy the two values into the respective variables in *main.tf* in the infra directory.
+
+    make bootstrap
+You should first see these variables after completing `make bootstrap`.
+<br>
+<img src="readme-images/bootstrap-vars-1.png" alt="boostrap-vars" width=30% height=30%>
+<br>
+
+Following that, you will copy the **dynamoDb_lock_table_name** and the **tf_state_bucket** and paste them into the *makefile*. You should be only changing the **bucket** (using the **tf_state_bucket** variable) and **dynamodb_table** (using the **dynamoDb_lock_table_name**) variables under the init command.
+<br>
+<img src="readme-images/bootstrap-vars-2.png" alt="boostrap-vars" width=50% height=50%>
+<br>
+
+After that, use the **kops_state_bucket_name** and add that to *config.yml*. Around line 34, there is a line that has;
+    kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-
+Replace the **rmit-kops-state-** with the variable that **kops_state_bucket_name** provided from the `make bootstrap` command.
+<br>
+<img src="readme-images/bootstrap-vars-3.png" alt="boostrap-vars" width=50% height=50%>
+<br>
+
+Finally, use the **repository-url** output and add that to the **ECR** and **reponame** variables in *config.yml* (Somewhere around line 130 under the package jobs). The link before the forward slash ('/'), that goes into the **ECR** variable, whereas the name after the forward slash ('/'), goes into the **reponame** variable.
+<br>
+<img src="readme-images/bootstrap-vars-4.png" alt="boostrap-vars" width=50% height=50%>
+<br>
+
+Once you have compeleted that, push your changes to GitHub.
+
+### Setting up CircleCi
+We will now set up CircleCi to being deployment. Open up the link https://circleci.com/ and press the **Go to App** icon on the top right. If you haven't linked your GitHub account to CircleCi, please do it now. After that, go to the Projects page (button on the left side), and find the repository. Press the **Set up Project** button and it'll coninue to the next screen. Press the **Use Existing Config** button, then **Start Building**.
+<br>
+<img src="readme-images/circleci-setup-1.png" alt="circleci-setup" width=50% height=50%>
+<br>
+<img src="readme-images/circleci-setup-2.png" alt="circleci-setup" width=50% height=50%>
+<br>
+<img src="readme-images/circleci-setup-3.png" alt="circleci-setup" width=30% height=30%>
+<br>
 
 ## Running commands
 
