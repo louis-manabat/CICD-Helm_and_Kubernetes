@@ -125,6 +125,16 @@ We will now set up CircleCi to being deployment. Open up the link https://circle
 <img src="readme-images/circleci-setup-3.png" alt="circleci-setup" width=30% height=30%>
 <br>
 
+The first and inital pipeline should fail at the package job because it might be missing (or using invalid variables) because it is running from the master branch.
+<br>
+<img src="readme-images/circleci-fail-master.png" alt="circleci-fail-master" width=50% height=50%>
+<br>
+
+The build should be successful as it only runs the build and integration-test jobs (if the pipeline runs from any other branch other than the master branch). If it does fail, ensure you have inputted the correct variables in the *config.yml* file and push the changes so it runs the pipeline again.
+<br>
+<img src="readme-images/circleci-pass-branch.png" alt="circleci-pass-branch" width=50% height=50%>
+<br>
+
 ## Running commands
 
 
