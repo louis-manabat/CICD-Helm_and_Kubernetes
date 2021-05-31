@@ -110,8 +110,9 @@ Following that, you will copy the **dynamoDb_lock_table_name** and the **tf_stat
 <img src="readme-images/bootstrap-vars-2.png" alt="boostrap-vars" width=50% height=50%>
 <br>
 
-After that, use the **kops_state_bucket_name** and add that to *config.yml*. Around line 34, there is a line that has;
+After that, use the **kops_state_bucket_name** and add that to *config.yml*. Around line 34 (under the setup-cd command), there is a line that has;
     kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-
+This also applies on around line 109 also on *config.yml*. It will be under the e2e job.
 Replace the **rmit-kops-state-** with the variable that **kops_state_bucket_name** provided from the `make bootstrap` command.
 <br>
 <img src="readme-images/bootstrap-vars-3.png" alt="boostrap-vars" width=50% height=50%>
