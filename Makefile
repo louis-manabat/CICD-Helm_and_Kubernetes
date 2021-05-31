@@ -4,6 +4,16 @@ namespace-up namespace-down ssh-gen
 bootstrap:
 	cd bootstrap && terraform init
 	cd bootstrap && terraform apply --auto-approve
+	
+install-deps:
+	sudo apt install vim curl wget dos2unix -y
+
+install-tf:
+	install-tf:
+	cd /tmp && \
+	wget https://releases.hashicorp.com/terraform/0.15.4/terraform_0.15.4_linux_amd64.zip && \
+	unzip terraform_0.15.4_linux_amd64.zip && \
+	sudo mv terraform /usr/local/bin
 
 ########
 # KOPS
