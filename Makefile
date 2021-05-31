@@ -68,7 +68,7 @@ kube-config:
 #######
 
 namespace-up:
-
+	kubectl create namespace test
 
 namespace-down:
 
