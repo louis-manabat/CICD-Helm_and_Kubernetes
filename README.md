@@ -14,7 +14,7 @@
 
 # Analysis and Solution
 ## Analysis of the problem
-
+The process of creating the artifact has now been containerised into a Docker container. This simplifies part of the deployment of the solution. The next task is to get the solution running through Kubernetes on a CD pipeline to make the deployment of the solution easier.
 
 ## Explain and justify the solution
 
