@@ -206,12 +206,7 @@ A successful validation of the cluster should look like this
 ## Running Commands
 
 ### Setup test environment
-Next you want to being running the infrastructure that's going to host the solution. You will need to run the following commands to deploy it in a test environment.
-
-    cd infra
-    ENV=test make init
-
-Let this run, then open up the console to this link https://console.aws.amazon.com/vpc/home?region=us-east-1#. Follow this up with opening up the **Subnets** tab.
+Next you want to being setup the infrastructure that's going to host the solution. Open up the console to this link https://console.aws.amazon.com/vpc/home?region=us-east-1#. Follow this up with opening up the **Subnets** tab.
 <br>
 <img src="readme-images/tfvars-setup-1.png" alt="tfvars-setup" width=30% height=30%>
 <br>
