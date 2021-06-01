@@ -11,6 +11,7 @@
         - [Setting up AWS Credentials](#Setting-up-AWS-Credentials)
         - [Pre-setup](#Pre-setup)
         - [KOPS Cluster Setup](#KOPS-Cluster-Setup)
+    - [Running Commands](#Running-Commands)
 
 
 # Analysis and Solution
@@ -94,6 +95,7 @@ After doing this, open up a new tab in your terminal and run the command `mkdir 
 
 ### Pack
 The following command will dockerise the solution into a Docker image for future use.
+
     make pack
 
 ### Bootstrap
@@ -111,6 +113,7 @@ Following that, you will copy the **dynamoDb_lock_table_name** and the **tf_stat
 <br>
 
 After that, use the **kops_state_bucket_name** and add that to *config.yml*. Around line 34 (under the setup-cd command), there is a line that has;
+
     kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-
 This also applies on around line 109 also on *config.yml*. It will be under the e2e job.
 Replace the **rmit-kops-state-** with the variable that **kops_state_bucket_name** provided from the `make bootstrap` command.
@@ -164,6 +167,7 @@ From there you will need to pass the name of environmental variables (in all cap
 
 ### Generate SSH Key
 Running the following command will create an SSH key that will be used by Kubernetes.
+
     make ssh-gen
 
 ### KOPS Cluster Setup
@@ -171,17 +175,21 @@ Running the following command will create an SSH key that will be used by Kubern
 Now we will spin up the KOPS cluster.
 
 First run the following command to create the cluster
+
     make kube-create-cluster
 You will get an error saying "*SSH public key must be specified when running with AWS*". Just ignore that as we move onto the next command.
 
 Running the next command will use the SSH key previously created, to link it to AWS.
+
     make kube-secret
 No errors means the make command was successfully run.
 
 After that, run the following command to deploy the cluster to AWS
+
     make kube-deploy-cluster
 
 Finally, export some config from the S3 kops bucket to finish off the spinning of the cluster using following command.
+
     make kube-config
 
 The cluster should take up to 10 minutes for it to ready itself for deployment. So running the following command too early might result in an error.
@@ -195,6 +203,27 @@ A successful validation of the cluster should look like this
 <img src="readme-images/kube-validate-pass.png" alt="kube-validate-pass" width=40% height=40%>
 <br>
 
+## Running Commands
+
+### Setup test environment
+Next you want to being running the infrastructure that's going to host the solution. You will need to run the following commands to deploy it in a test environment.
+
+    cd infra
+    ENV=test make init
+
+Let this run, then open up the console to this link https://console.aws.amazon.com/vpc/home?region=us-east-1#. Follow this up with opening up the **Subnets** tab.
+<br>
+<img src="readme-images/tfvars-setup-1.png" alt="tfvars-setup" width=30% height=30%>
+<br>
+
+You want to copy the two Subnet IDs (under the name us-east-1a.rmit.k8s.local and us-east-1b.rmit.k8s.local), then copy it into the terraform.tfvars file in the infra directory.
+<br>
+<img src="readme-images/tfvars-setup-2.png" alt="tfvars-setup" width=30% height=30%>
+<br>
+<img src="readme-images/tfvars-setup-3.png" alt="tfvars-setup" width=20% height=20%>
+<br>
+
+You want to then return to the [VPC](https://console.aws.amazon.com/vpc/home?region=us-east-1#) page, then open up the **VPCs** tab (above the **Subnets** tab). You want to copy the VPC ID under the name *rmit.k8s.local*
 
 # Simple Todo App with MongoDB, Express.js and Node.js
 The ToDo app uses the following technologies and javascript libraries:
