@@ -8,8 +8,9 @@
     - [Pre-requisites](#Pre-requisites)
         - [Manual installations](#Manual-installation)
         - [Semi-automatic installation](#Semi-automatic-installation)
-    - [Setting up AWS Credentials](#Setting-up-AWS-Credentials)
-    - [Running commands](#Running-commands)
+        - [Setting up AWS Credentials](#Setting-up-AWS-Credentials)
+        - [Pre-setup](#Pre-setup)
+        - [KOPS Cluster Setup](#KOPS-Cluster-Setup)
 
 
 # Analysis and Solution
@@ -63,6 +64,9 @@ Please note before getting started you must have an AWS account to get started. 
 
 #### After successfully running that command, run the following commands (Each line is a new command)
     make install-deps
+    make install-aws
+    make install-docker (you will need to reboot your system or run the command `sudo reboot now` otherwise docker won't work and `make pack` won't work)
+    make install-kops
     make install-tf
 
 
@@ -84,8 +88,112 @@ After doing this, open up a new tab in your terminal and run the command `mkdir 
 <img src="readme-images/aws-credentials-vim.png" alt="AWS-cred-vim" width=50% height=50%>
 <img src="readme-images/aws-credentials-vim-2.png" alt="AWS-cred-vim-2" width=50% height=50%>
 
-## Running commands
+##### Please note that the credentials expire every 3 hours, so you will need to update them once they do expire.
 
+## Pre-setup
+
+### Pack
+The following command will dockerise the solution into a Docker image for future use.
+    make pack
+
+### Bootstrap
+The following command will create some files to make a remote backend. Run the command **once only** and them copy the two values into the respective variables in *main.tf* in the infra directory.
+
+    make bootstrap
+You should first see these variables after completing `make bootstrap`.
+<br>
+<img src="readme-images/bootstrap-vars-1.png" alt="boostrap-vars" width=30% height=30%>
+<br>
+
+Following that, you will copy the **dynamoDb_lock_table_name** and the **tf_state_bucket** and paste them into the *makefile*. You should be only changing the **bucket** (using the **tf_state_bucket** variable) and **dynamodb_table** (using the **dynamoDb_lock_table_name**) variables under the init command.
+<br>
+<img src="readme-images/bootstrap-vars-2.png" alt="boostrap-vars" width=50% height=50%>
+<br>
+
+After that, use the **kops_state_bucket_name** and add that to *config.yml*. Around line 34 (under the setup-cd command), there is a line that has;
+    kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-
+This also applies on around line 109 also on *config.yml*. It will be under the e2e job.
+Replace the **rmit-kops-state-** with the variable that **kops_state_bucket_name** provided from the `make bootstrap` command.
+<br>
+<img src="readme-images/bootstrap-vars-3.png" alt="boostrap-vars" width=50% height=50%>
+<br>
+
+Finally, use the **repository-url** output and add that to the **ECR** and **reponame** variables in *config.yml* (Somewhere around line 130 under the package jobs). The link before the forward slash ('/'), that goes into the **ECR** variable, whereas the name after the forward slash ('/'), goes into the **reponame** variable.
+<br>
+<img src="readme-images/bootstrap-vars-4.png" alt="boostrap-vars" width=50% height=50%>
+<br>
+
+Once you have compeleted that, push your changes to GitHub.
+
+### Setting up CircleCi
+We will now set up CircleCi to being deployment. Open up the link https://circleci.com/ and press the **Go to App** icon on the top right. If you haven't linked your GitHub account to CircleCi, please do it now. After that, go to the Projects page (button on the left side), and find the repository. Press the **Set up Project** button and it'll coninue to the next screen. Press the **Use Existing Config** button, then **Start Building**.
+<br>
+<img src="readme-images/circleci-setup-1.png" alt="circleci-setup" width=50% height=50%>
+<br>
+<img src="readme-images/circleci-setup-2.png" alt="circleci-setup" width=50% height=50%>
+<br>
+<img src="readme-images/circleci-setup-3.png" alt="circleci-setup" width=30% height=30%>
+<br>
+
+The first and inital pipeline should fail at the package job because it might be missing (or using invalid variables) because it is running from the master branch.
+<br>
+<img src="readme-images/circleci-fail-master.png" alt="circleci-fail-master" width=50% height=50%>
+<br>
+
+The build should be successful as it only runs the build and integration-test jobs (if the pipeline runs from any other branch other than the master branch). If it does fail, ensure you have inputted the correct variables in the *config.yml* file and push the changes so it runs the pipeline again.
+<br>
+<img src="readme-images/circleci-pass-branch.png" alt="circleci-pass-branch" width=50% height=50%>
+<br>
+
+Next you will need to set up the AWS credentials. Get the variables from the [Setting up AWS Credentials](#Setting-up-AWS-Credentials) as we will be using them here as well.
+<br>
+
+First press the **Project Settings** button, then on the lefthand sidebar, press the **Environmental Variables** button.
+<br>
+<img src="readme-images/circleci-setup-4.png" alt="circleci-setup" width=50% height=50%>
+<br>
+<img src="readme-images/circleci-setup-5.png" alt="circleci-setup" width=20% height=20%>
+<br>
+
+From there you will need to pass the name of environmental variables (in all caps), and the variable itself. You do this by pressing the the **Add Environmental Variable** button. There should be three separate variables in there and should look like this.
+<br>
+<img src="readme-images/circleci-setup-6.png" alt="circleci-setup" width=50% height=50%>
+<br>
+
+##### Please note that the credentials expire every 3 hours, so you will need to update them once they do expire.
+
+### Generate SSH Key
+Running the following command will create an SSH key that will be used by Kubernetes.
+    make ssh-gen
+
+### KOPS Cluster Setup
+
+Now we will spin up the KOPS cluster.
+
+First run the following command to create the cluster
+    make kube-create-cluster
+You will get an error saying "*SSH public key must be specified when running with AWS*". Just ignore that as we move onto the next command.
+
+Running the next command will use the SSH key previously created, to link it to AWS.
+    make kube-secret
+No errors means the make command was successfully run.
+
+After that, run the following command to deploy the cluster to AWS
+    make kube-deploy-cluster
+
+Finally, export some config from the S3 kops bucket to finish off the spinning of the cluster using following command.
+    make kube-config
+
+The cluster should take up to 10 minutes for it to ready itself for deployment. So running the following command too early might result in an error.
+    make kube-validate
+<br>
+<img src="readme-images/kube-validate-fail.png" alt="kube-validate-fail" width=40% height=40%>
+<br>
+
+A successful validation of the cluster should look like this
+<br>
+<img src="readme-images/kube-validate-pass.png" alt="kube-validate-pass" width=40% height=40%>
+<br>
 
 
 # Simple Todo App with MongoDB, Express.js and Node.js
