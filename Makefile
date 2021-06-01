@@ -6,7 +6,7 @@ bootstrap:
 	cd bootstrap && terraform apply --auto-approve
 	
 install-deps:
-	sudo apt install vim curl wget unzip -y
+	sudo apt install vim curl wget unzip tar -y
 
 install-aws:
 	cd /tmp && \
@@ -19,9 +19,16 @@ install-docker:
 	sudo systemctl start docker
 	sudo systemctl enable docker
 	cd /tmp && \
-	sudo curl -L "https://github.com/docker/compose/releases/download/1.28.4/docker-compose-$(uname -s)-$(uname -m)" -o/usr/local/bin/docker-compose && \
+	sudo curl -L "https://github.com/docker/compose/releases/download/1.28.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
 	sudo chmod +x /usr/local/bin/docker-compose
 	sudo usermod -aG docker $(USER)
+	echo "Please restart your system for Docker to work"
+
+install-helm:
+	cd /tmp && \
+	wget https://get.helm.sh/helm-v3.6.0-linux-amd64.tar.gz && \
+	tar -zxvf helm-v3.6.0-linux-amd64.tar.gz && \
+	sudo mv linux-amd64/helm /usr/local/bin/helm
 
 install-kops:
 	cd /tmp && \
