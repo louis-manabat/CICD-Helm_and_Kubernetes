@@ -1,5 +1,5 @@
 .PHONY: bootstrap kube-create-cluster kube-secret kube-delete-cluster kube-deploy-cluster kube-validate kube-config \
-namespace-up namespace-down ssh-gen install-deps install-aws install-docker install-kops install-tf pack
+namespace-up namespace-down ssh-gen install-deps install-aws install-docker install-helm install-kops install-tf pack
 
 bootstrap:
 	cd bootstrap && terraform init
@@ -7,6 +7,7 @@ bootstrap:
 	
 install-deps:
 	sudo apt install vim curl wget unzip tar -y
+	sudo snap install kubectl --classic
 
 install-aws:
 	cd /tmp && \
