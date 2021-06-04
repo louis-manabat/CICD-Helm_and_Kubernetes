@@ -191,23 +191,26 @@ jobs:
             cd artifacts/infra
             make init
             make up
-            echo "mongodb://$(terraform output db_user | tr -d '"'):$(terraform output db_pass | tr -d '"')@$(terraform output db_endpoint | tr -d '"')" > ../dbendpointurl.txt
+            echo "mongodb://$(terraform output -raw db_user):$(terraform output -raw db_pass)@$(terraform output -raw db_endpoint)" > ../dbendpointurl.txt
 
+# deploy helm chart
+
+# smoke test
 
 workflows:
   version: 2
   build-test-package:
     jobs:
       - build
-      - deploy-test:
-          requires:
-            - build
       - integration-test:
           requires: 
             - build
       - package:
           requires:
             - integration-test
-          filters:
-            branches:
-              only: master
+      - deploy-test:
+          requires:
+            - package
+          # filters:
+          #   branches:
+          #     only: master
