@@ -196,7 +196,7 @@ jobs:
       - run:
           name: Deploy app
           command: |
-            helm upgrade todo artifacts/todo-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbendpointurl.txt)
+            helm upgrade helm/todo artifacts/todo-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbendpointurl.txt)
 
 # deploy helm chart
 
