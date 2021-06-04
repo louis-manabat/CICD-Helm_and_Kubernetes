@@ -1,16 +1,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "todo-app"
+  name: "todo"
 spec:
   selector:
     matchLabels:
-      app: "todo-app"
+      app: "todo"
   replicas: 5
   template:
     metadata:
       labels:
-        app: "todo-app"
+        app: "todo"
     spec:
       containers:
       - image: {{ .Values.dockerImage }}
