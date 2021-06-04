@@ -1,4 +1,0 @@
-dockerImage: "todoapp:latest"
-db_endpoint: ""
-db_user: ""
-db_pass: ""
