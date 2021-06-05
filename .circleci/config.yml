@@ -31,7 +31,7 @@ commands:
           sudo curl -LO https://github.com/kubernetes/kops/releases/download/v1.18.0/kops-linux-amd64
           sudo chmod +x kops-linux-amd64
           sudo mv kops-linux-amd64 /usr/local/bin/kops
-          kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-ypwn6v
+          kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-u1kzxg
 
   smoke-test:
     parameters:
@@ -106,7 +106,7 @@ jobs:
             sudo curl -LO https://github.com/kubernetes/kops/releases/download/v1.18.0/kops-linux-amd64
             sudo chmod +x kops-linux-amd64
             sudo mv kops-linux-amd64 /usr/local/bin/kops
-            kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-ypwn6v
+            kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-u1kzxg
 
             apt-get install jq -y
 
