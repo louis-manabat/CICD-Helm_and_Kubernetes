@@ -179,28 +179,42 @@ First run the following command to create the cluster
     make kube-create-cluster
 You will get an error saying "*SSH public key must be specified when running with AWS*". Just ignore that as we move onto the next command.
 
+<br>
+
 Running the next command will use the SSH key previously created, to link it to AWS.
 
     make kube-secret
 No errors means the make command was successfully run.
 
+<br>
+
 After that, run the following command to deploy the cluster to AWS
 
     make kube-deploy-cluster
+
+<br>
 
 Finally, export some config from the S3 kops bucket to finish off the spinning of the cluster using following command.
 
     make kube-config
 
-The cluster should take up to 10 minutes for it to ready itself for deployment. So running the following command too early might result in an error.
-    make kube-validate
 <br>
+
+The cluster should take up to 10 minutes for it to ready itself for deployment. So running the following command too early might result in an error.
+
+    make kube-validate
 <img src="readme-images/kube-validate-fail.png" alt="kube-validate-fail" width=40% height=40%>
 <br>
 
 A successful validation of the cluster should look like this
 <br>
 <img src="readme-images/kube-validate-pass.png" alt="kube-validate-pass" width=40% height=40%>
+<br>
+
+Finally, run this command to create the namespace for the application to run on.
+
+    make namespace-up
+<img src="readme-images/namespace-up.png" alt="namespace-up" width=40% height=40%>
 <br>
 
 ## Running Commands
