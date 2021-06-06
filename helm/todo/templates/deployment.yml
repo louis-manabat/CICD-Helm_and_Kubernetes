@@ -1,27 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: "todo"
+  name: "todo-app"
 spec:
   selector:
     matchLabels:
-      app: "todo"
+      app: "todo-app"
   replicas: 5
   template:
     metadata:
       labels:
-        app: "todo"
+        app: "todo-app"
     spec:
       containers:
       - image: {{ .Values.dockerImage }}
-        imagePullPolicy: Always
         name: "todo-app"
         env:
-          - name: DB_ENDPOINT
-            value: {{ .Values.db_endpoint }}
-          - name: DB_USERNAME
-            value: {{ .Values.db_user }}
-          - name: DB_PASSWORD
-            value: {{ .Values.db_pass }}
+          - name: DB_URL
+            value: {{ .Values.dbhost }}
         ports:
         - containerPort: 5000
