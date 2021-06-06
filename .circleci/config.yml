@@ -31,7 +31,7 @@ commands:
           sudo curl -LO https://github.com/kubernetes/kops/releases/download/v1.18.0/kops-linux-amd64
           sudo chmod +x kops-linux-amd64
           sudo mv kops-linux-amd64 /usr/local/bin/kops
-          kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-<<update-me>>
+          kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-wqa23o
 
   smoke-test:
     parameters:
@@ -106,7 +106,7 @@ jobs:
             sudo curl -LO https://github.com/kubernetes/kops/releases/download/v1.18.0/kops-linux-amd64
             sudo chmod +x kops-linux-amd64
             sudo mv kops-linux-amd64 /usr/local/bin/kops
-            kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-<<update-me>>
+            kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-wqa23o
 
             apt-get install jq -y
 
@@ -128,8 +128,8 @@ jobs:
   package:
     machine: true
     environment:
-      ECR: <update-me>
-      reponame: <update-me>
+      ECR: 441586826508.dkr.ecr.us-east-1.amazonaws.com
+      reponame: rmit-assignment3-container-repo
     steps:
       - checkout
 
@@ -174,6 +174,34 @@ jobs:
           paths:
             - artifacts
 
+  deploy-test:
+    docker:
+      - image: cimg/base:2021.05
+    environment:
+      ENV: test
+    steps:
+      - attach_workspace:
+          at: ./
+
+      - setup-cd
+
+      - run:
+          name: Deploy infra
+          command: |
+            cd artifacts/infra
+            make init
+            make up
+            echo "mongodb://$(terraform output -raw db_user):$(terraform output -raw db_pass)@$(terraform output -raw db_endpoint)" > ../dbendpointurl.txt
+
+      - run:
+          name: Deploy app
+          command: |
+            helm upgrade todo artifacts/todo-0.1.0.tgz -i -n test --wait --set dockerImage=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbendpointurl.txt)
+
+      - run: sleep 60
+      
+      - smoke-test
+
 workflows:
   version: 2
   build-test-package:
@@ -188,3 +216,6 @@ workflows:
           filters:
             branches:
               only: master
+      - deploy-test:
+          requires:
+            - package
