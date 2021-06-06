@@ -1,8 +1,8 @@
 subnet_ids = [
-    "subnet-065d659de7d08f512",
-    "subnet-01d425515409ff457"
+    "subnet-0f588af5b6bc034cf",
+    "subnet-02616a81a7f3af11a"
 ]
 username = "mongoUsername"
 password = "mongoPassword"
-vpc_id = "vpc-00a4d0b296875aeea"
+vpc_id = "vpc-0732e54822360d009"
 name = "todo-db"
