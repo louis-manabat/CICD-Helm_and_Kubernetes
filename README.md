@@ -93,11 +93,6 @@ After doing this, open up a new tab in your terminal and run the command `mkdir 
 
 ## Pre-setup
 
-### Pack
-The following command will dockerise the solution into a Docker image for future use.
-
-    make pack
-
 ### Bootstrap
 The following command will create some files to make a remote backend. Run the command **once only** and them copy the two values into the respective variables in *main.tf* in the infra directory.
 
@@ -138,7 +133,7 @@ We will now set up CircleCi to being deployment. Open up the link https://circle
 <img src="readme-images/circleci-setup-3.png" alt="circleci-setup" width=30% height=30%>
 <br>
 
-The first and inital pipeline should fail at the package job because it might be missing (or using invalid variables) because it is running from the master branch.
+The first and inital pipeline should fail at the package job because it might be missing (or is using invalid) variables because it is running from the master branch.
 <br>
 <img src="readme-images/circleci-fail-master.png" alt="circleci-fail-master" width=50% height=50%>
 <br>
@@ -233,6 +228,23 @@ You want to copy the two Subnet IDs (under the name us-east-1a.rmit.k8s.local an
 <br>
 
 You want to then return to the [VPC](https://console.aws.amazon.com/vpc/home?region=us-east-1#) page, then open up the **VPCs** tab (above the **Subnets** tab). You want to copy the VPC ID under the name *rmit.k8s.local*
+<br>
+<img src="readme-images/tfvars-setup-4.png" alt="tfvars-setup" width=30% height=30%>
+<br>
+<img src="readme-images/tfvars-setup-5.png" alt="tfvars-setup" width=20% height=20%>
+<br>
+
+
+To see if you have successfully got the cluster up and running, run this command:
+
+    kubectl get service -n test
+<br>
+Your output should look like this if the cluster spin up is successful.
+<br>
+<img src="readme-images/kubectl_get-service.png" alt="kubectl_check-service" width=50% height=50%>
+<br>
+
+Copy the **External-IP** link and insert that into your web browser. You should see this, and the cluster should be successfully up and running.
 
 # Simple Todo App with MongoDB, Express.js and Node.js
 The ToDo app uses the following technologies and javascript libraries:
