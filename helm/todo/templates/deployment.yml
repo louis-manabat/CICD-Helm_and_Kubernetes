@@ -14,7 +14,9 @@ spec:
     spec:
       containers:
       - image: {{ .Values.dockerImage }}
-        imagePullPolicy: Always
         name: "todo-app"
+        env:
+          - name: db_url
+            value: {{ .Values.dbhost }}
         ports:
         - containerPort: 5000

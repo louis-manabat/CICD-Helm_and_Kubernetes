@@ -1,1 +1,2 @@
-dockerImage: "todoapp:latest"
+dockerImage: "dummy1"
+dbhost: "dummy2"
