@@ -197,12 +197,10 @@ jobs:
           name: Deploy app
           command: |
             helm upgrade todo artifacts/todo-0.1.0.tgz -i -n test --wait --set dockerImage=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbendpointurl.txt)
+
+      - run: sleep 60
       
       - smoke-test
-
-# deploy helm chart
-
-# smoke test
 
 workflows:
   version: 2
