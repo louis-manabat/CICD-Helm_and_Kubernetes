@@ -12,6 +12,8 @@
         - [Pre-setup](#Pre-setup)
         - [KOPS Cluster Setup](#KOPS-Cluster-Setup)
     - [Running Commands](#Running-Commands)
+    - [Accessing Solution](#Accessing-Solution)
+- [How to tear down the solution](#How-to-tear-down-the-solution)
 
 
 # Analysis and Solution
@@ -49,6 +51,25 @@ Please note before getting started you must have an AWS account to get started. 
     sudo apt update -y
     sudo apt upgrade -y
     sudo apt install curl make wget vim -y
+    sudo snap install kubectl --classic
+
+### Installing AWS
+    cd /tmp/
+	curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+	unzip awscliv2.zip
+	sudo ./aws/install
+
+### Installing Helm
+    cd /tmp/
+	wget https://get.helm.sh/helm-v3.6.0-linux-amd64.tar.gz
+	tar -zxvf helm-v3.6.0-linux-amd64.tar.gz
+	sudo mv linux-amd64/helm /usr/local/bin/helm
+
+### Installing KOPS
+    cd /tmp/
+	curl -LO https://github.com/kubernetes/kops/releases/download/v1.18.0/kops-linux-amd64
+	chmod +x kops-linux-amd64
+	sudo mv kops-linux-amd64 /usr/local/bin/kops
 
 #### Installing Terraform
     cd /tmp/
@@ -66,7 +87,7 @@ Please note before getting started you must have an AWS account to get started. 
 #### After successfully running that command, run the following commands (Each line is a new command)
     make install-deps
     make install-aws
-    make install-docker (you will need to reboot your system or run the command `sudo reboot now` otherwise docker won't work and `make pack` won't work)
+    make install-helm
     make install-kops
     make install-tf
 
@@ -115,10 +136,12 @@ Replace the **rmit-kops-state-** with the variable that **kops_state_bucket_name
 <br>
 <img src="readme-images/bootstrap-vars-3.png" alt="boostrap-vars" width=50% height=50%>
 <br>
+<img src="readme-images/bootstrap-vars-4.png" alt="boostrap-vars" width=50% height=50%>
+<br>
 
 Finally, use the **repository-url** output and add that to the **ECR** and **reponame** variables in *config.yml* (Somewhere around line 130 under the package jobs). The link before the forward slash ('/'), that goes into the **ECR** variable, whereas the name after the forward slash ('/'), goes into the **reponame** variable.
 <br>
-<img src="readme-images/bootstrap-vars-4.png" alt="boostrap-vars" width=50% height=50%>
+<img src="readme-images/bootstrap-vars-5.png" alt="boostrap-vars" width=50% height=50%>
 <br>
 
 Once you have compeleted that, push your changes to GitHub.
@@ -234,17 +257,93 @@ You want to then return to the [VPC](https://console.aws.amazon.com/vpc/home?reg
 <img src="readme-images/tfvars-setup-5.png" alt="tfvars-setup" width=20% height=20%>
 <br>
 
+After this you will want to push the changes to your repository. ***Please note that for this to deploy, it will need to done in the master branch. If you have branched off elsewhere, do a pull request into master***.
 
-To see if you have successfully got the cluster up and running, run this command:
+Your CircleCi should show 4 different jobs: *build*, *integration-test*, *package* and *deploy-test*. The pipeline should look like this if it's successful.
+<br>
+<img src="readme-images/successful_master_ci_build1.png" alt="successful_master_ci_build" width=40% height=40%>
+<br>
+<img src="readme-images/successful_master_ci_build2.png" alt="successful_master_ci_build" width=50% height=50%>
+<br>
+
+## Accessing Solution
+### Via CircleCi
+To get the URL to access the solution via CircleCi, open up the *Smoke Test* step in the *deploy-test* job, and you should see a url that was echo'ed at the bottom.
+<br>
+<img src="readme-images/load-balancer_smoke-test.png" alt="lb_smoke-test" width=60% height=60%>
+<br>
+
+### Via terminal (kubectl)
+To get the URL to access the solution via terminal, run the following command. Note that this will be another way to see if the solution is up and running if you do not have access to CircleCi.
 
     kubectl get service -n test
-<br>
 Your output should look like this if the cluster spin up is successful.
 <br>
-<img src="readme-images/kubectl_get-service.png" alt="kubectl_check-service" width=50% height=50%>
+<img src="readme-images/kubectl_get-service.png" alt="kubectl_check-service" width=60% height=60%>
 <br>
 
 Copy the **External-IP** link and insert that into your web browser. You should see this, and the cluster should be successfully up and running.
+<br>
+<img src="readme-images/solution_working.png" alt="solution_working" width=60% height=60%>
+<br>
+
+## How to tear down the solution
+To tear down the solution, you will need to run several commands to destory and shut down the application.
+<br>
+
+Before starting, open up the **Project Settings** in your CircleCi pipeline repository, and press the **Unfollow Project** button. This will make sure the solution does not get deployed again unless it is needed to be redeployed.
+<img src="readme-images/circleci-unfollow.png" alt="circleci-unfollow" width=50% height=50%>
+<br>
+
+
+<br>
+First run the following command to destroy the namespace
+
+    make namespace-down
+<img src="readme-images/namespace_down.png" alt="namespace_down" width=50% height=50%>
+<br>
+
+You will then need to open up the DocumentDB cluster page (https://console.aws.amazon.com/docdb/home?region=us-east-1#clusters), tick the **todo-db-test-docdb-cluster**, press the **Actions** button, then select the **Delete** button.
+<img src="readme-images/destroy_docdb1.png" alt="destroy_docdb" width=50% height=50%>
+<br>
+
+You will get a prompt to ensure you are wanting to delete the cluster, select **No**, tick the box below and enter `delete entire cluster`. Once you delete it, you will need to wait a bit until it deletes before you can continue.
+<br>
+<img src="readme-images/destroy_docdb2.png" alt="destroy_docdb" width=40% height=40%>
+<br>
+
+Next open up the DocumentDB Subnet groups page (https://console.aws.amazon.com/docdb/home?region=us-east-1#subnetGroups), then select the **todo-db-test-db-subnet-group**, press the **Actions** button, then select the **Delete** button.
+<img src="readme-images/destroy_docdb3.png" alt="destroy_docdb" width=60% height=60%>
+<br>
+<img src="readme-images/destroy_docdb4.png" alt="destroy_docdb" width=40% height=40%>
+<br>
+
+Open up the Security Groups page in the VPC service (https://console.aws.amazon.com/vpc/home?region=us-east-1#securityGroups:), then select the sec group that's named **Allow MongoDB Port**, open the **Actions** dropdown, then select **Delete security groups**. Then press the **Delete** button on the prompt.
+<br>
+<img src="readme-images/destroy_docdb5.png" alt="destroy_docdb" width=60% height=60%>
+<br>
+<img src="readme-images/destroy_docdb6.png" alt="destroy_docdb" width=40% height=40%>
+<br>
+
+After deleting the DocumentDB stuff, run the command `helm list -A` to see the name(s) of deployed application(s).
+<br>
+<img src="readme-images/helm1.png" alt="helm" width=60% height=60%>
+<br>
+
+Once you find out the name(s) of the application(s), run the following command to uninstall the deployed application.
+
+    helm uninstall <name> -n <namespace>
+    e.g. helm uninstall todo -n test
+<img src="readme-images/helm2.png" alt="helm" width=40% height=40%>
+<br>
+
+Finally run the following command to delete everything that is left (***Please note that this will take some time***).
+
+    make kube-delete-cluster
+This should be the final lines before it completes, that means the cluster and the site is fully destroyed.
+<br>
+<img src="readme-images/kube-down.png" alt="kube-down" width=40% height=40%>
+<br>
 
 # Simple Todo App with MongoDB, Express.js and Node.js
 The ToDo app uses the following technologies and javascript libraries:
