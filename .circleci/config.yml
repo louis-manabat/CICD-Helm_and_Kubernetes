@@ -125,8 +125,10 @@ jobs:
             export ENDPOINT=http://$(kubectl get service/todo-app -n << parameters.envName >> -o json | jq '.status.loadBalancer.ingress[0].hostname' | sed -e 's/^"//' -e 's/"$//')
             echo $ENDPOINT
             cd src
-            chmod +x ./e2e.sh
-            ./e2e.sh
+            npm install
+            npm start &
+            npx wait-on $ENDPOINT
+            npm run test-e2e
 
   package:
     machine: true
