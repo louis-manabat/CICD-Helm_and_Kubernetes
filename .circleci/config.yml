@@ -256,6 +256,10 @@ workflows:
       - e2e:
           requires:
             - deploy-test
-      - deploy-prod:
+      - approval:
+          type: approval
           requires:
             - e2e
+      - deploy-prod:
+          requires:
+            - approval
