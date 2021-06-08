@@ -12,7 +12,10 @@
         - [Pre-setup](#Pre-setup)
         - [KOPS Cluster Setup](#KOPS-Cluster-Setup)
     - [Running Commands](#Running-Commands)
+        - [Distinction task (Production Approval)](#Distinction-task-(Production-Approval))
+    - [Distinction Task](#Distinction-Task)
     - [Accessing Solution](#Accessing-Solution)
+    - [Accessing Solution (Distinction task)](#Accessing-Solution-(Distinction-task))
 - [How to tear down the solution](#How-to-tear-down-the-solution)
 
 
@@ -30,7 +33,7 @@ Terraform: Terraform is the tool that automates the creation and updating of AWS
 
 AWS: This is the service where the client wants to deploy the solution onto. Services such as an EC2 virtual machine instance, VPCs, S3 buckets and DynamoDB will be used to help run the Todo App solution when it is deployed.
 
-CircleCI: CircleCI was used to automate the packing of the artefact, from doing linting and vulnerability checks to making a packed solution. It will also be used to fully automate the deployment process.
+CircleCI: CircleCI was used to automate the packing of the artifact, from doing linting and vulnerability checks to making a packed solution. It will also be used to fully automate the deployment process.
 
 Docker: Docker will be used to containerise the application. It will pack the solution into an image. Once the the image has been created, it just needs to be deployed for it to be running.
 
@@ -146,8 +149,8 @@ Finally, use the **repository-url** output and add that to the **ECR** and **rep
 
 Once you have compeleted that, push your changes to GitHub.
 
-### Setting up CircleCi
-We will now set up CircleCi to being deployment. Open up the link https://circleci.com/ and press the **Go to App** icon on the top right. If you haven't linked your GitHub account to CircleCi, please do it now. After that, go to the Projects page (button on the left side), and find the repository. Press the **Set up Project** button and it'll coninue to the next screen. Press the **Use Existing Config** button, then **Start Building**.
+### Setting up CircleCI
+We will now set up CircleCI to being deployment. Open up the link https://circleci.com/ and press the **Go to App** icon on the top right. If you haven't linked your GitHub account to CircleCI, please do it now. After that, go to the Projects page (button on the left side), and find the repository. Press the **Set up Project** button and it'll coninue to the next screen. Press the **Use Existing Config** button, then **Start Building**.
 <br>
 <img src="readme-images/circleci-setup-1.png" alt="circleci-setup" width=50% height=50%>
 <br>
@@ -259,22 +262,43 @@ You want to then return to the [VPC](https://console.aws.amazon.com/vpc/home?reg
 
 After this you will want to push the changes to your repository. ***Please note that for this to deploy, it will need to done in the master branch. If you have branched off elsewhere, do a pull request into master***.
 
-Your CircleCi should show 4 different jobs: *build*, *integration-test*, *package* and *deploy-test*. The pipeline should look like this if it's successful.
+### Distinction task (Production Approval)
+With the production environment also being deployed, you will need to approve that after the e2e job is complete. Open up the pipeline in CircleCI, and in the latest pipeline, it should have a status saying **On Hold**. To let this pass, you need to press the thumb icon in the actions column (refer to image below) to progress into the deploy-prod job.
 <br>
-<img src="readme-images/successful_master_ci_build1.png" alt="successful_master_ci_build" width=40% height=40%>
+<img src="readme-images/ci-approval1.png" alt="ci-approval" width=60% height=60%>
 <br>
-<img src="readme-images/successful_master_ci_build2.png" alt="successful_master_ci_build" width=50% height=50%>
+
+A prompt will show that you want to confirm the approval to be approved. Press the **Approve** button to move to the deploy-prod job. Once done, a tick should appear where the thumb icon initially was, then the pipeline will be complete.
+<br>
+<img src="readme-images/ci-approval2.png" alt="ci-approval" width=40% height=40%>
+<br>
+<img src="readme-images/ci-approval3.png" alt="ci-approval" width=60% height=60%>
+<br>
+
+Your CircleCI should show 4 different jobs: *build*, *integration-test*, *package* and *deploy-test*. The pipeline should look like this if it's successful.
+<br>
+<img src="readme-images/successful_master_ci_build1.png" alt="successful_master_ci_build" width=70% height=70%>
+<br>
+<img src="readme-images/successful_master_ci_build2.png" alt="successful_master_ci_build" width=60% height=60%>
+<br>
+
+#### Distinction Task
+With the production deployment also added to the pipeline, it should now look like this.
+<br>
+<img src="readme-images/di-deploy-prod2.png" alt="deploy-prod" width=70% height=70%>
+<br>
+<img src="readme-images/di-deploy-prod1.png" alt="deploy-prod" width=60% height=60%>
 <br>
 
 ## Accessing Solution
-### Via CircleCi
-To get the URL to access the solution via CircleCi, open up the *Smoke Test* step in the *deploy-test* job, and you should see a url that was echo'ed at the bottom.
+### Via CircleCI
+To get the URL to access the solution via CircleCI, open up the *Smoke Test* step in the *deploy-test* job, and you should see a url that was echo'ed at the bottom.
 <br>
 <img src="readme-images/load-balancer_smoke-test.png" alt="lb_smoke-test" width=60% height=60%>
 <br>
 
 ### Via terminal (kubectl)
-To get the URL to access the solution via terminal, run the following command. Note that this will be another way to see if the solution is up and running if you do not have access to CircleCi.
+To get the URL to access the solution via terminal, run the following command. Note that this will be another way to see if the solution is up and running if you do not have access to CircleCI.
 
     kubectl get service -n test
 Your output should look like this if the cluster spin up is successful.
@@ -287,14 +311,27 @@ Copy the **External-IP** link and insert that into your web browser. You should 
 <img src="readme-images/solution_working.png" alt="solution_working" width=60% height=60%>
 <br>
 
+## Accessing Solution (Distinction task)
+### Via CircleCI
+Opening up the Smoke Test step in the deploy-prod job should give you the link to access the solution.
+<br>
+<img src="readme-images/di-load-balancer_smoke-test.png" alt="di-lb_smoke-test" width=70% height=70%>
+<br>
+
+### Via terminal (kubectl)
+Alternatively, you can also run the following command to also get the link
+
+    kubectl get service -n prod
+<img src="readme-images/di-kubectl_get-service.png" alt="di-kubectl_check-service" width=60% height=60%>
+<br>
+
 ## How to tear down the solution
 To tear down the solution, you will need to run several commands to destory and shut down the application.
 <br>
 
-Before starting, open up the **Project Settings** in your CircleCi pipeline repository, and press the **Unfollow Project** button. This will make sure the solution does not get deployed again unless it is needed to be redeployed.
+Before starting, open up the **Project Settings** in your CircleCI pipeline repository, and press the **Unfollow Project** button. This will make sure the solution does not get deployed again unless it is needed to be redeployed.
 <img src="readme-images/circleci-unfollow.png" alt="circleci-unfollow" width=50% height=50%>
 <br>
-
 
 <br>
 First run the following command to destroy the namespace
@@ -303,7 +340,8 @@ First run the following command to destroy the namespace
 <img src="readme-images/namespace_down.png" alt="namespace_down" width=50% height=50%>
 <br>
 
-You will then need to open up the DocumentDB cluster page (https://console.aws.amazon.com/docdb/home?region=us-east-1#clusters), tick the **todo-db-test-docdb-cluster**, press the **Actions** button, then select the **Delete** button.
+You will then need to open up the DocumentDB cluster page (https://console.aws.amazon.com/docdb/home?region=us-east-1#clusters), tick the **todo-db-test-docdb-cluster**, press the **Actions** button, then select the **Delete** button. Do this as well for the **todo-db-prod-docdb-cluster**.
+<br>
 <img src="readme-images/destroy_docdb1.png" alt="destroy_docdb" width=50% height=50%>
 <br>
 
@@ -312,13 +350,14 @@ You will get a prompt to ensure you are wanting to delete the cluster, select **
 <img src="readme-images/destroy_docdb2.png" alt="destroy_docdb" width=40% height=40%>
 <br>
 
-Next open up the DocumentDB Subnet groups page (https://console.aws.amazon.com/docdb/home?region=us-east-1#subnetGroups), then select the **todo-db-test-db-subnet-group**, press the **Actions** button, then select the **Delete** button.
+Next open up the DocumentDB Subnet groups page (https://console.aws.amazon.com/docdb/home?region=us-east-1#subnetGroups), then select the **todo-db-test-db-subnet-group**, press the **Actions** button, then select the **Delete** button. Do this as well for the ****todo-db-prod-db-subnet-group**.
+<br>
 <img src="readme-images/destroy_docdb3.png" alt="destroy_docdb" width=60% height=60%>
 <br>
 <img src="readme-images/destroy_docdb4.png" alt="destroy_docdb" width=40% height=40%>
 <br>
 
-Open up the Security Groups page in the VPC service (https://console.aws.amazon.com/vpc/home?region=us-east-1#securityGroups:), then select the sec group that's named **Allow MongoDB Port**, open the **Actions** dropdown, then select **Delete security groups**. Then press the **Delete** button on the prompt.
+Open up the Security Groups page in the VPC service (https://console.aws.amazon.com/vpc/home?region=us-east-1#securityGroups:), then select the sec groups that's named **Allow MongoDB Port** (security group names: **todo-db-test-sg** and **todo-db-prod-sg**), open the **Actions** dropdown, then select **Delete security groups**. Then press the **Delete** button on the prompt.
 <br>
 <img src="readme-images/destroy_docdb5.png" alt="destroy_docdb" width=60% height=60%>
 <br>
@@ -330,10 +369,17 @@ After deleting the DocumentDB stuff, run the command `helm list -A` to see the n
 <img src="readme-images/helm1.png" alt="helm" width=60% height=60%>
 <br>
 
+The following image will be in relation to when the prod version also gets deployed (Please Refer to that part [here](#Distinction-Task))
+<br>
+<img src="readme-images/helm1-1.png" alt="helm" width=60% height=60%>
+<br>
+
 Once you find out the name(s) of the application(s), run the following command to uninstall the deployed application.
 
     helm uninstall <name> -n <namespace>
-    e.g. helm uninstall todo -n test
+    e.g. 
+    helm uninstall todo -n test
+    helm uninstall todo -n prod
 <img src="readme-images/helm2.png" alt="helm" width=40% height=40%>
 <br>
 
