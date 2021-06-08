@@ -1,5 +1,5 @@
 .PHONY: bootstrap kube-create-cluster kube-secret kube-delete-cluster kube-deploy-cluster kube-validate kube-config \
-namespace-up namespace-down ssh-gen install-deps install-aws install-helm install-kops install-tf pack
+namespace-up namespace-down ssh-gen install-deps install-aws install-docker install-helm install-kops install-tf
 
 bootstrap:
 	cd bootstrap && terraform init
@@ -63,9 +63,11 @@ kube-config:
 
 namespace-up:
 	kubectl create namespace test
+	kubectl create namespace prod
 
 namespace-down:
 	kubectl delete namespace test
+	kubectl delete namespace prod
 
 ########
 # SSH
