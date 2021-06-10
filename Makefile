@@ -88,17 +88,8 @@ acw-namespace-up:
 	kubectl create namespace amazon-cloudwatch
 	kubectl get namespaces
 
-acw-namespace-down:
-	kubectl delete namespace amazon-cloudwatch
-
 acw-fluentd:
 	aws iam attach-role-policy --role-name nodes.rmit.k8s.local --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
 	kubectl create configmap cluster-info --from-literal=cluster.name=rmit.k8s.local --from-literal=logs.region=us-east-1 -n amazon-cloudwatch
 	wget https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/fluentd/fluentd.yaml
 	kubectl apply -f fluentd.yaml
-
-acw-helm-apply-sol:
-	helm repo add test http://$(shell kubectl get service/todo-app -n test -o json | jq '.status.loadBalancer.ingress[0].hostname' | sed -e 's/^"//' -e 's/"$//')
-	helm install todo-test test
-	helm repo add prod http://$(shell kubectl get service/todo-app -n prod -o json | jq '.status.loadBalancer.ingress[0].hostname' | sed -e 's/^"//' -e 's/"$//')
-	helm install todo-prod prod
