@@ -1,12 +1,13 @@
 .PHONY: bootstrap kube-create-cluster kube-secret kube-delete-cluster kube-deploy-cluster kube-validate kube-config \
-namespace-up namespace-down ssh-gen install-deps install-aws install-docker install-helm install-kops install-tf
+namespace-up namespace-down ssh-gen install-deps install-aws install-docker install-helm install-kops install-tf \
+acw-namespace-up acw-fluentd
 
 bootstrap:
 	cd bootstrap && terraform init
 	cd bootstrap && terraform apply --auto-approve
 	
 install-deps:
-	sudo apt install vim curl wget unzip tar -y
+	sudo apt install vim curl wget unzip tar jq -y
 	sudo snap install kubectl --classic
 
 install-aws:
@@ -78,3 +79,17 @@ ssh-gen:
 	yes | ssh-keygen -t rsa -b 4096 -f ~/keys/ec2-key -P ''
 	chmod 0644 ~/keys/ec2-key.pub
 	chmod 0600 ~/keys/ec2-key
+
+########
+# Logging
+########
+
+acw-namespace-up:
+	kubectl create namespace amazon-cloudwatch
+	kubectl get namespaces
+
+acw-fluentd:
+	aws iam attach-role-policy --role-name nodes.rmit.k8s.local --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+	kubectl create configmap cluster-info --from-literal=cluster.name=rmit.k8s.local --from-literal=logs.region=us-east-1 -n amazon-cloudwatch
+	wget https://raw.githubusercontent.com/aws-samples/amazon-cloudwatch-container-insights/latest/k8s-deployment-manifest-templates/deployment-mode/daemonset/container-insights-monitoring/fluentd/fluentd.yaml
+	kubectl apply -f fluentd.yaml

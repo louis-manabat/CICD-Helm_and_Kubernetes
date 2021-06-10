@@ -14,6 +14,7 @@
     - [Running Commands](#Running-Commands)
         - [Distinction task (Production Approval)](#Distinction-task-(Production-Approval))
     - [Distinction Task](#Distinction-Task)
+    - [High Distinction task (Setting up logging for kubernetes)](#High-Distinction-task-(Setting-up-logging-for-kubernetes))
     - [Accessing Solution](#Accessing-Solution)
     - [Accessing Solution (Distinction task)](#Accessing-Solution-(Distinction-task))
 - [How to tear down the solution](#How-to-tear-down-the-solution)
@@ -288,6 +289,53 @@ With the production deployment also added to the pipeline, it should now look li
 <img src="readme-images/di-deploy-prod2.png" alt="deploy-prod" width=70% height=70%>
 <br>
 <img src="readme-images/di-deploy-prod1.png" alt="deploy-prod" width=60% height=60%>
+<br>
+
+## High Distinction task (Setting up logging for kubernetes)
+With the pipeline setup and application deployed, you are able to setup logging for your cluster for whenever the solution is deployed.
+
+### Setup namespace
+Run the following command to initalise the amazon cloudwatch namespace. Successful creation should show it in the `kubectl get namespaces` command that runs right after creating the namespace.
+
+    make acw-namespace-up
+<img src="readme-images/acw-namespace-up.png" alt="acw-namespace-up" width=60% height=60%>
+<br>
+
+### Applying Fluentd
+Fluentd, which is a data source collector, is what we will use to log to amazon cloud watch. Run the following command to get it setup.
+
+    make acw-fluentd
+<img src="readme-images/acw-fluentd-setup.png" alt="acw-fluentd-setup" width=60% height=60%>
+<br>
+
+Open up the AWS CloudWatch Insights (https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:logs-insights) and paste one of the follow two pieces of queries in. You should see results when you interact with the website.
+
+#### To check for test namespace
+    fields @timestamp, @message
+    | filter kubernetes.container_name = "todo-app"
+    | filter kubernetes.namespace_name = "test"
+    | sort @timestamp desc
+    | limit 20
+You should get results like this when you set up CloudWatch correctly.
+<br>
+<img src="readme-images/aws-cw-test-1.png" alt="aws-cw-test" width=60% height=60%>
+<br>
+Then see this when you expand one of the results
+<br>
+<img src="readme-images/aws-cw-test-2.png" alt="aws-cw-test" width=60% height=60%>
+<br>
+ 
+#### To check for prod namespace
+    fields @timestamp, @message
+    | filter kubernetes.container_name = "todo-app"
+    | filter kubernetes.namespace_name = "prod"
+    | sort @timestamp desc
+    | limit 20
+Similar to the query result for the test namespace
+<br>
+<img src="readme-images/aws-cw-prod-1.png" alt="aws-cw-prod" width=60% height=60%>
+<br>
+<img src="readme-images/aws-cw-prod-2.png" alt="aws-cw-prod" width=60% height=60%>
 <br>
 
 ## Accessing Solution
