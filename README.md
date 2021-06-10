@@ -290,6 +290,23 @@ With the production deployment also added to the pipeline, it should now look li
 <img src="readme-images/di-deploy-prod1.png" alt="deploy-prod" width=60% height=60%>
 <br>
 
+## Setting up logging for kubernetes
+With the pipeline setup and application deployed, you are able to setup logging for your cluster for whenever the solution is deployed.
+
+### Setup namespace
+Run the following command to initalise the amazon cloudwatch namespace. Successful creation should show it in the `kubectl get namespaces` command that runs right after creating the namespace.
+
+    make acw-namespace-up
+<img src="readme-images/acw-namespace-up.png" alt="acw-namespace-up" width=60% height=60%>
+<br>
+
+### Applying Fluentd
+Fluentd, which is a data source collector, is what we will use to log to amazon cloud watch. Run the following command to get it setup.
+
+    make acw-fluentd
+<img src="readme-images/acw-fluentd-setup.png" alt="acw-fluentd-setup" width=60% height=60%>
+<br>
+
 ## Accessing Solution
 ### Via CircleCI
 To get the URL to access the solution via CircleCI, open up the *Smoke Test* step in the *deploy-test* job, and you should see a url that was echo'ed at the bottom.
