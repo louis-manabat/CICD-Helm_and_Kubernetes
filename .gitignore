@@ -67,3 +67,4 @@ keys/
 terraform.tfstate
 terraform.tfstate.backup
 tmp/
+fluentd.yaml*
