@@ -247,9 +247,9 @@ workflows:
       - package:
           requires:
             - integration-test
-          # filters:
-          #   branches:
-          #     only: master
+          filters:
+            branches:
+              only: master
       - deploy-test:
           requires:
             - package
